@@ -119,7 +119,7 @@ const QUESTION_BANK = {
       "Musik",
       200,
       "Wie weit entfernt von hier wurde dieses Video aufgenommen (Luftlinie)?",
-      "circa 14k KM",
+      "circa 8750 Kilometer",
       { videoSrc: "./Videos/Rave1.mp4" },
     ),
     makeQuestion("Musik", 300, "Wie heißt das Debütalbum von Billie Eilish?", "When We All Fall Asleep, Where Do We Go?"),
@@ -395,7 +395,7 @@ function quizBoard() {
 
 function questionScreen(question) {
   return `
-    <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""}" data-question-stage-trigger="true">
+    <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""}" data-question-stage-trigger="true">
       <button type="button" class="back-link" id="back-to-board">Zurück zum Quizboard</button>
       <div class="question-stage-card">
         <div class="question-head-inline">
@@ -415,7 +415,11 @@ function questionScreen(question) {
                         ? "Cinema Paradiso"
                         : question.category === "Filme" && question.points === 1000
                           ? "Das Phantom der Oper"
-                      : "placeholder"
+                        : question.category === "Musik" && question.points === 100
+                          ? "Dreh den Swag auf - Money Boy"
+                        : question.category === "Musik" && question.points === 200
+                          ? "Fortunate Son - CCR"
+                        : "placeholder"
               }</p>`
             : ""
         }

@@ -486,6 +486,43 @@ h2 {
   color: #fff;
 }
 
+.question-screen.is-music-200-question {
+  min-height: calc(100vh - 24px);
+  padding: 4px 0;
+}
+
+.question-screen.is-music-200-question .question-stage-card {
+  max-height: calc(100vh - 24px);
+  padding: 16px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.question-screen.is-music-200-question .question-copy {
+  margin-top: 4px;
+}
+
+.question-screen.is-music-200-question .question-copy h1 {
+  max-width: 34ch;
+  font-size: clamp(1rem, 1.8vw, 1.35rem);
+}
+
+.question-screen.is-music-200-question .video-panel {
+  margin-top: 2px;
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  place-items: center;
+}
+
+.question-screen.is-music-200-question .question-video {
+  width: min(100%, 960px);
+  max-height: min(54vh, 620px);
+  height: auto;
+  object-fit: contain;
+}
+
 .question-subtitle {
   margin: 20px 0 0;
   font-size: clamp(2.18rem, 4.8vw, 3.15rem);
@@ -804,5 +841,20 @@ button:active:not(:disabled) {
 
   .film100-image {
     max-height: min(42vh, 340px);
+  }
+
+  .question-screen.is-music-200-question .question-stage-card {
+    max-height: calc(100vh - 18px);
+    padding: 12px 12px 14px;
+    gap: 6px;
+  }
+
+  .question-screen.is-music-200-question .question-copy h1 {
+    max-width: 28ch;
+    font-size: clamp(0.92rem, 3.6vw, 1.08rem);
+  }
+
+  .question-screen.is-music-200-question .question-video {
+    max-height: min(46vh, 420px);
   }
 }
