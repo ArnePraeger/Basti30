@@ -122,8 +122,111 @@ const QUESTION_BANK = {
       "circa 8750 Kilometer",
       { videoSrc: "./Videos/Rave1.mp4" },
     ),
-    makeQuestion("Musik", 300, "Wie heißt das Debütalbum von Billie Eilish?", "When We All Fall Asleep, Where Do We Go?"),
-    makeQuestion("Musik", 500, "Wer ist als 'King of Pop' bekannt?", "Michael Jackson"),
+    makeQuestion(
+      "Musik",
+      300,
+      "Wieviele Klicks haben folgende Lieder/Sets (Stand 01.04.2026 - 21:54)?",
+      "",
+      {
+        hideAnswerButton: true,
+        music300Tracks: [
+          {
+            id: "reitender-urzwerg",
+            title: "reitenderurzwerg - Batou",
+            url: "https://soundcloud.com/batou01/reitenderurzwerg",
+            clickCount: "2.357",
+          },
+          {
+            id: "yt-zhx",
+            title: "Sebastian - DJ Ostkurve feat Anny",
+            url: "https://www.youtube.com/watch?v=zHXrwzuavcY",
+            clickCount: "50.931",
+          },
+          {
+            id: "yt-hcm",
+            title: "Ai Se Eu Te Pego - Michel Teló",
+            url: "https://www.youtube.com/watch?v=hcm55lU9knw",
+            clickCount: "1.261.964.083",
+          },
+        ],
+      },
+    ),
+    makeQuestion(
+      "Musik",
+      500,
+      "Welche 5 aus 10 Songs waren am 04.04.1996 in den Top10 der deutschen Charts",
+      "",
+      {
+        hideAnswerButton: true,
+        music500Tracks: [
+          {
+            id: "snap-rhythm",
+            title: "SNAP! - Rhythm Is A Dancer",
+            url: "https://www.youtube.com/watch?v=JYIaWeVL1JM",
+            releaseYear: "1992",
+          },
+          {
+            id: "fools-lemon-tree",
+            title: "Fools Garden - Lemon Tree",
+            url: "https://www.youtube.com/watch?v=wCQfkEkePx8",
+            releaseYear: "1996",
+            isTop10OnDate: true,
+          },
+          {
+            id: "celine-my-heart",
+            title: "Celine Dion - My Heart Will Go On",
+            url: "https://www.youtube.com/watch?v=F2RnxZnubCM",
+            releaseYear: "1998",
+          },
+          {
+            id: "raab-maus",
+            title: "Stefan Raab - Hier kommt die Maus",
+            url: "https://www.youtube.com/watch?v=D9ATffcUOns",
+            releaseYear: "1996",
+            isTop10OnDate: true,
+          },
+          {
+            id: "rednex-cotton-eye",
+            title: "Rednex - Cotton Eye Joe",
+            url: "https://www.youtube.com/watch?v=mOYZaiDZ7BM",
+            releaseYear: "1994",
+          },
+          {
+            id: "bluemchen-herz",
+            title: "Blümchen - Herz an Herz",
+            url: "https://www.youtube.com/watch?v=2JCelVI6U68",
+            releaseYear: "1996",
+            isTop10OnDate: true,
+          },
+          {
+            id: "matthias-reim",
+            title: "Matthias Reim - Verdammt, ich lieb dich",
+            url: "https://www.youtube.com/watch?v=joCrurvOPcI",
+            releaseYear: "1990",
+          },
+          {
+            id: "scooter-valentine",
+            title: "Scooter - Let Me Be Your Valentine",
+            url: "https://www.youtube.com/watch?v=4DcmI0QaDhc",
+            releaseYear: "1996",
+            isTop10OnDate: true,
+          },
+          {
+            id: "robert-miles-children",
+            title: "Robert Miles - Children",
+            url: "https://www.youtube.com/watch?v=CC5ca6Hsb2Q",
+            releaseYear: "1996",
+            isTop10OnDate: true,
+          },
+          {
+            id: "french-affair-heart-goes-boom",
+            title: "French Affair - My Heart Goes Boom",
+            url: "https://www.youtube.com/watch?v=oXMV2RBQwiY",
+            releaseYear: "2000",
+          },
+        ],
+      },
+    ),
     makeQuestion("Musik", 1000, "KARAOKE TIME!!", "", { hideAnswerButton: true }),
   ],
   Sport: [
@@ -163,6 +266,8 @@ function makeQuestion(category, points, question, answer, options = {}) {
     incorrectChoiceId: options.incorrectChoiceId ?? null,
     hideAnswerButton: options.hideAnswerButton ?? false,
     videoSrc: options.videoSrc ?? "",
+    music300Tracks: options.music300Tracks ?? [],
+    music500Tracks: options.music500Tracks ?? [],
   };
 }
 
@@ -184,6 +289,8 @@ function buildInitialState() {
     activeQuestionId: null,
     revealStage: 0,
     posterRevealState: {},
+    music300RevealState: {},
+    music500RevealState: {},
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
   };
@@ -218,6 +325,14 @@ function loadState() {
       posterRevealState: {
         ...fallback.posterRevealState,
         ...parsed.posterRevealState,
+      },
+      music300RevealState: {
+        ...fallback.music300RevealState,
+        ...parsed.music300RevealState,
+      },
+      music500RevealState: {
+        ...fallback.music500RevealState,
+        ...parsed.music500RevealState,
       },
     };
   } catch {
@@ -265,6 +380,8 @@ function resetQuestionsOnly() {
       ),
     ),
     posterRevealState: {},
+    music300RevealState: {},
+    music500RevealState: {},
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
   }));
@@ -355,7 +472,7 @@ function quizBoard() {
                     return `
                       <button
                         type="button"
-                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 1000) ? `is-music-${entry.points}` : ""}"
+                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""}"
                         data-question-id="${entry.id}"
                         ${questionState.used || locked ? "disabled" : ""}
                       >
@@ -393,9 +510,56 @@ function quizBoard() {
   `;
 }
 
+function getYouTubeVideoId(url) {
+  try {
+    const parsed = new URL(url);
+    const host = parsed.hostname.replace(/^www\./, "");
+
+    if (host === "youtu.be") {
+      return parsed.pathname.slice(1);
+    }
+
+    if (host === "youtube.com" || host === "m.youtube.com") {
+      return parsed.searchParams.get("v");
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function buildMusicTrackEmbed(track) {
+  if (track.url.includes("soundcloud.com")) {
+    return {
+      src: `https://w.soundcloud.com/player/?url=${encodeURIComponent(track.url)}&auto_play=false&show_comments=false&show_user=true&show_reposts=false&visual=true`,
+      title: `${track.title} SoundCloud Player`,
+      height: 180,
+      allow: "autoplay",
+    };
+  }
+
+  const videoId = getYouTubeVideoId(track.url);
+
+  if (!videoId) {
+    return null;
+  }
+
+  return {
+    src: `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1&playsinline=1`,
+    title: `${track.title} YouTube Player`,
+    height: 180,
+    allow:
+      "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
+  };
+}
+
 function questionScreen(question) {
+  const isMusic300 = question.category === "Musik" && question.points === 300;
+  const isMusic500 = question.category === "Musik" && question.points === 500;
+
   return `
-    <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""}" data-question-stage-trigger="true">
+    <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""} ${isMusic300 ? "is-music-300-question" : ""} ${isMusic500 ? "is-music-500-question" : ""}" data-question-stage-trigger="true">
       <button type="button" class="back-link" id="back-to-board">Zurück zum Quizboard</button>
       <div class="question-stage-card">
         <div class="question-head-inline">
@@ -419,6 +583,12 @@ function questionScreen(question) {
                           ? "Dreh den Swag auf - Money Boy"
                         : question.category === "Musik" && question.points === 200
                           ? "Fortunate Son - CCR"
+                        : question.category === "Musik" && question.points === 300
+                          ? "Verflixxte Klixx - Der Song zur Sendung"
+                        : question.category === "Musik" && question.points === 500
+                          ? "CDY - LACAZETTE x JAZEEK"
+                        : question.category === "Musik" && question.points === 1000
+                          ? "Ain't No Mountain High Enough - Marvin Gaye & Tammi Terrell"
                         : "placeholder"
               }</p>`
             : ""
@@ -509,7 +679,102 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage >= 2 && !question.factChoices.length
+          state.revealStage >= 1 && question.music300Tracks.length
+            ? `
+              <div class="music300-grid">
+                ${question.music300Tracks
+                  .map((track) => {
+                    const embed = buildMusicTrackEmbed(track);
+                    const solved = !!state.music300RevealState[question.id]?.[track.id];
+
+                    return `
+                      <article class="music300-card">
+                        <p class="music300-title">${escapeHtml(track.title)}</p>
+                        ${
+                          embed
+                            ? `
+                              <div class="music300-player-wrap">
+                                <iframe
+                                  class="music300-player"
+                                  src="${embed.src}"
+                                  title="${escapeHtml(embed.title)}"
+                                  height="${embed.height}"
+                                  allow="${embed.allow}"
+                                  loading="lazy"
+                                  allowfullscreen
+                                ></iframe>
+                              </div>
+                            `
+                            : `<p class="music300-missing">Player konnte fuer diesen Link nicht erstellt werden.</p>`
+                        }
+                        <button
+                          type="button"
+                          class="ghost-button music300-solve"
+                          data-music300-reveal-question-id="${question.id}"
+                          data-music300-reveal-track-id="${track.id}"
+                          ${solved ? "disabled" : ""}
+                        >
+                          Lösen
+                        </button>
+                        ${solved ? `<p class="music300-clicks is-visible">${escapeHtml(track.clickCount)}</p>` : ""}
+                      </article>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 1 && question.music500Tracks.length
+            ? `
+              <div class="music500-grid">
+                ${question.music500Tracks
+                  .map((track) => {
+                    const embed = buildMusicTrackEmbed(track);
+                    const solved = !!state.music500RevealState[question.id]?.[track.id];
+                    const resultClass = solved ? (track.isTop10OnDate ? "is-correct" : "is-wrong") : "";
+
+                    return `
+                      <article class="music300-card music500-card ${resultClass}">
+                        <p class="music300-title">${escapeHtml(track.title)}</p>
+                        ${
+                          embed
+                            ? `
+                              <div class="music300-player-wrap">
+                                <iframe
+                                  class="music300-player"
+                                  src="${embed.src}"
+                                  title="${escapeHtml(embed.title)}"
+                                  height="${embed.height}"
+                                  allow="${embed.allow}"
+                                  loading="lazy"
+                                  allowfullscreen
+                                ></iframe>
+                              </div>
+                            `
+                            : `<p class="music300-missing">Player konnte fuer diesen Link nicht erstellt werden.</p>`
+                        }
+                        <button
+                          type="button"
+                          class="ghost-button music300-solve"
+                          data-music500-reveal-question-id="${question.id}"
+                          data-music500-reveal-track-id="${track.id}"
+                          ${solved ? "disabled" : ""}
+                        >
+                          Lösen
+                        </button>
+                        ${solved ? `<p class="music300-clicks is-visible">${escapeHtml(track.releaseYear)}</p>` : ""}
+                      </article>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length
             ? `
               <div class="answer-panel">
                 <p class="answer-label">Lösung</p>
@@ -530,7 +795,7 @@ function questionScreen(question) {
               : ""
           }
           ${
-            state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)
+            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500
               ? `<button type="button" class="primary-button" id="return-to-board">Zurück zum Quiz</button>`
               : ""
           }
@@ -773,6 +1038,42 @@ function bindQuestionEvents() {
           [questionId]: {
             ...(current.posterRevealState[questionId] ?? {}),
             [posterId]: true,
+          },
+        },
+      }));
+    });
+  });
+
+  document.querySelectorAll("[data-music300-reveal-track-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const questionId = button.getAttribute("data-music300-reveal-question-id");
+      const trackId = button.getAttribute("data-music300-reveal-track-id");
+
+      setState((current) => ({
+        ...current,
+        music300RevealState: {
+          ...current.music300RevealState,
+          [questionId]: {
+            ...(current.music300RevealState[questionId] ?? {}),
+            [trackId]: true,
+          },
+        },
+      }));
+    });
+  });
+
+  document.querySelectorAll("[data-music500-reveal-track-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const questionId = button.getAttribute("data-music500-reveal-question-id");
+      const trackId = button.getAttribute("data-music500-reveal-track-id");
+
+      setState((current) => ({
+        ...current,
+        music500RevealState: {
+          ...current.music500RevealState,
+          [questionId]: {
+            ...(current.music500RevealState[questionId] ?? {}),
+            [trackId]: true,
           },
         },
       }));
