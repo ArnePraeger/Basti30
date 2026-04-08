@@ -271,7 +271,33 @@ const QUESTION_BANK = {
     makeQuestion("Basti", 100, "Wieviele Kilometer gibt Basti als Arbeitsweg für die Kilometerpauschale bei seiner Steuererklärung an?", "181km"),
     makeQuestion("Basti", 200, 'Basti fährt jedes Jahr Anfang August zum "Conquest of Mythodea". Das ist ein Larp-Event. Wofür steht die Abkürzung "Larp"?', "Live Action Role Play"),
     makeQuestion("Basti", 300, "Wie lautet Bastis genaue Jobbezeichnung?", "Key Account Manager"),
-    makeQuestion("Basti", 500, "Wieviele Mitbewohnis hatte Basti bisher seitdem er in Leipzig wohnt? Zwischenmieten inklusive!", ""),
+    makeQuestion(
+      "Basti",
+      500,
+      "Wieviele Mitbewohnis hatte Basti bisher seitdem er in Leipzig wohnt? Zwischenmieten inklusive!",
+      "",
+      {
+        hideAnswerButton: true,
+        basti500Photos: [
+          { id: "01-arne", src: "./Bilder/Basti500/01_Arne.jpg", alt: "Arne" },
+          { id: "02-callin", src: "./Bilder/Basti500/02_Callin.jpg", alt: "Callin" },
+          { id: "03-jette", src: "./Bilder/Basti500/03_Jette.jpg", alt: "Jette" },
+          { id: "04-gabel", src: "./Bilder/Basti500/04_Gabel.jpg", alt: "Gabel" },
+          { id: "05-kathi", src: "./Bilder/Basti500/05_Kathi.jpg", alt: "Kathi" },
+          { id: "06-tina", src: "./Bilder/Basti500/06_Tina.jpg", alt: "Tina" },
+          { id: "07-artem", src: "./Bilder/Basti500/07_Artem.jpg", alt: "Artem" },
+          { id: "08-denise", src: "./Bilder/Basti500/08_Denise.jpg", alt: "Denise" },
+          { id: "09-alina", src: "./Bilder/Basti500/09_Alina.png", alt: "Alina" },
+          { id: "10-lorena", src: "./Bilder/Basti500/10_Lorena.jpg", alt: "Lorena" },
+          { id: "11-lina", src: "./Bilder/Basti500/11_Lina.png", alt: "Lina" },
+          { id: "12-jakob", src: "./Bilder/Basti500/12_Jakob.jpg", alt: "Jakob" },
+          { id: "13-luis", src: "./Bilder/Basti500/13_luis.JPG", alt: "Luis" },
+          { id: "14-torben", src: "./Bilder/Basti500/14_torben.JPG", alt: "Torben" },
+          { id: "15-samu", src: "./Bilder/Basti500/15_samu.jpeg", alt: "Samu" },
+          { id: "16-ole", src: "./Bilder/Basti500/16_ole.jpg", alt: "Ole" },
+        ],
+      },
+    ),
     makeQuestion("Basti", 1000, "ELFBAR-TASTING!", "", { hideAnswerButton: true }),
   ],
   Random: [
@@ -301,6 +327,7 @@ function makeQuestion(category, points, question, answer, options = {}) {
     music500Tracks: options.music500Tracks ?? [],
     sport300Prompts: options.sport300Prompts ?? [],
     sport500Rings: options.sport500Rings ?? false,
+    basti500Photos: options.basti500Photos ?? [],
   };
 }
 
@@ -326,6 +353,7 @@ function buildInitialState() {
     music500RevealState: {},
     sport300RevealState: {},
     sport500RevealState: {},
+    basti500RevealState: {},
     singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
@@ -378,6 +406,10 @@ function loadState() {
         ...fallback.sport500RevealState,
         ...parsed.sport500RevealState,
       },
+      basti500RevealState: {
+        ...fallback.basti500RevealState,
+        ...parsed.basti500RevealState,
+      },
       singleQuestionResetMode: false,
     };
   } catch {
@@ -429,6 +461,7 @@ function resetQuestionsOnly() {
     music500RevealState: {},
     sport300RevealState: {},
     sport500RevealState: {},
+    basti500RevealState: {},
     singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
@@ -613,8 +646,11 @@ function questionScreen(question) {
   const isMusic300 = question.category === "Musik" && question.points === 300;
   const isMusic500 = question.category === "Musik" && question.points === 500;
   const isSport500 = question.category === "Sport" && question.points === 500 && question.sport500Rings;
+  const isBasti500 = question.category === "Basti" && question.points === 500 && question.basti500Photos.length > 0;
   const sport500RevealCount = isSport500 ? (state.sport500RevealState[question.id] ?? 0) : 0;
   const revealedRingKeys = SPORT_500_RING_REVEAL_ORDER.slice(0, sport500RevealCount);
+  const basti500RevealCount = isBasti500 ? (state.basti500RevealState[question.id] ?? 0) : 0;
+  const revealedBasti500Photos = isBasti500 ? question.basti500Photos.slice(0, basti500RevealCount) : [];
 
   return `
     <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""} ${isMusic300 ? "is-music-300-question" : ""} ${isMusic500 ? "is-music-500-question" : ""}" data-question-stage-trigger="true">
@@ -895,7 +931,24 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500
+          state.revealStage >= 1 && isBasti500
+            ? `
+              <div class="basti500-grid">
+                ${revealedBasti500Photos
+                  .map(
+                    (photo) => `
+                      <figure class="basti500-photo-card">
+                        <img src="${photo.src}" alt="${escapeHtml(photo.alt)}" class="basti500-photo" />
+                      </figure>
+                    `,
+                  )
+                  .join("")}
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500 && !isBasti500
             ? `
               <div class="answer-panel">
                 <p class="answer-label">Lösung</p>
@@ -905,6 +958,13 @@ function questionScreen(question) {
             : ""
         }
         <div class="question-actions">
+          ${
+            state.revealStage === 1 && isBasti500
+              ? `${basti500RevealCount < question.basti500Photos.length
+                  ? `<button type="button" class="primary-button" id="basti500-reveal-photo">Reveal</button>`
+                  : ""}`
+              : ""
+          }
           ${
             state.revealStage === 1 && isSport500
               ? `${sport500RevealCount < SPORT_500_RING_REVEAL_ORDER.length
@@ -923,7 +983,7 @@ function questionScreen(question) {
               : ""
           }
           ${
-            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length)
+            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length) && (!isBasti500 || basti500RevealCount >= question.basti500Photos.length)
               ? `<button type="button" class="primary-button" id="return-to-board">Zurück zum Quiz</button>`
               : ""
           }
@@ -1063,12 +1123,14 @@ function bindBoardEvents() {
           const nextMusic500RevealState = { ...current.music500RevealState };
           const nextSport300RevealState = { ...current.sport300RevealState };
           const nextSport500RevealState = { ...current.sport500RevealState };
+          const nextBasti500RevealState = { ...current.basti500RevealState };
 
           delete nextPosterRevealState[questionId];
           delete nextMusic300RevealState[questionId];
           delete nextMusic500RevealState[questionId];
           delete nextSport300RevealState[questionId];
           delete nextSport500RevealState[questionId];
+          delete nextBasti500RevealState[questionId];
 
           return {
             ...current,
@@ -1085,6 +1147,7 @@ function bindBoardEvents() {
             music500RevealState: nextMusic500RevealState,
             sport300RevealState: nextSport300RevealState,
             sport500RevealState: nextSport500RevealState,
+            basti500RevealState: nextBasti500RevealState,
           };
         });
         return;
@@ -1286,6 +1349,27 @@ function bindQuestionEvents() {
         ...current,
         sport500RevealState: {
           ...current.sport500RevealState,
+          [activeQuestion.id]: nextCount,
+        },
+      };
+    });
+  });
+
+  document.querySelector("#basti500-reveal-photo")?.addEventListener("click", () => {
+    const activeQuestion = state.activeQuestionId ? state.questions[state.activeQuestionId] : null;
+
+    if (!activeQuestion?.basti500Photos?.length) {
+      return;
+    }
+
+    setState((current) => {
+      const currentCount = current.basti500RevealState[activeQuestion.id] ?? 0;
+      const nextCount = Math.min(activeQuestion.basti500Photos.length, currentCount + 1);
+
+      return {
+        ...current,
+        basti500RevealState: {
+          ...current.basti500RevealState,
           [activeQuestion.id]: nextCount,
         },
       };
