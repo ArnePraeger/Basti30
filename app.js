@@ -1,6 +1,6 @@
 ﻿const STORAGE_KEY = "bdaybasti-quiz-state";
 
-const CATEGORIES = ["Filme", "Musik", "Sport", "SchwaBastian", "Random"];
+const CATEGORIES = ["Filme", "Musik", "Sport", "Basti", "Random"];
 const POINT_VALUES = [100, 200, 300, 500, 1000];
 const FILM_100_SERIES = [
   {
@@ -230,18 +230,49 @@ const QUESTION_BANK = {
     makeQuestion("Musik", 1000, "KARAOKE TIME!!", "", { hideAnswerButton: true }),
   ],
   Sport: [
-    makeQuestion("Sport", 100, "Wie viele Spieler stehen pro Team im Fußball gleichzeitig auf dem Feld?", "Elf"),
-    makeQuestion("Sport", 200, "Welche Sportart spielt man in Wimbledon?", "Tennis"),
-    makeQuestion("Sport", 300, "Wie viele Ringe hat das olympische Symbol?", "Fünf"),
-    makeQuestion("Sport", 500, "In welcher Sportart ist der Super Bowl das Finale?", "American Football"),
-    makeQuestion("Sport", 1000, "Wie heißt die höchste deutsche Fußballliga?", "Bundesliga"),
+    makeQuestion("Sport", 100, "Was ist Bastis Lieblingskraftsportübung?", "Bankdrücken"),
+    makeQuestion("Sport", 200, "Wie schnell, darf man in Deutschland mit einem E-Scooter im Straßenverkehr fahren?", "20 km/h"),
+    makeQuestion(
+      "Sport",
+      300,
+      "Beantwortet die drei Badminton-Fragen:",
+      "",
+      {
+        hideAnswerButton: true,
+        sport300Prompts: [
+          {
+            id: "court-area",
+            question: "Wieviele Quadratmeter hat ein Badminton-Doppel-Feld? (in qm)",
+            answer: "81,74",
+          },
+          {
+            id: "net-height",
+            question: "Wie hoch ist ein Badmintonnetz? (in cm)",
+            answer: "155",
+          },
+          {
+            id: "smash-speed",
+            question: "Wie schnell war der schnellste aufgezeichnete Badminton-Smash? (in km/h)",
+            answer: "565",
+          },
+        ],
+      },
+    ),
+    makeQuestion(
+      "Sport",
+      500,
+      "Welche Farben haben die olympischen Ringe (von rechts nach links)?",
+      "",
+      { hideAnswerButton: true, sport500Rings: true },
+    ),
+    makeQuestion("Sport", 1000, "EIERLAUF!", "", { hideAnswerButton: true }),
   ],
-  SchwaBastian: [
-    makeQuestion("SchwaBastian", 100, "Welcher Name steckt in dieser Spezialkategorie?", "Bastian"),
-    makeQuestion("SchwaBastian", 200, "Welche Farbe könnte gut zu einem Geburtstagsquiz passen?", "Gold"),
-    makeQuestion("SchwaBastian", 300, "Wie nennt man eine Feier zum Geburtstag noch?", "Party"),
-    makeQuestion("SchwaBastian", 500, "Was gehört fast immer zu einem Geburtstag?", "Kuchen"),
-    makeQuestion("SchwaBastian", 1000, "Welche Kategorie ist hier die persönliche Sonderrunde?", "SchwaBastian"),
+  Basti: [
+    makeQuestion("Basti", 100, "Wieviele Kilometer gibt Basti als Arbeitsweg für die Kilometerpauschale bei seiner Steuererklärung an?", "181km"),
+    makeQuestion("Basti", 200, 'Basti fährt jedes Jahr Anfang August zum "Conquest of Mythodea". Das ist ein Larp-Event. Wofür steht die Abkürzung "Larp"?', "Live Action Role Play"),
+    makeQuestion("Basti", 300, "Wie lautet Bastis genaue Jobbezeichnung?", "Key Account Manager"),
+    makeQuestion("Basti", 500, "Wieviele Mitbewohnis hatte Basti bisher seitdem er in Leipzig wohnt? Zwischenmieten inklusive!", ""),
+    makeQuestion("Basti", 1000, "ELFBAR-TASTING!", "", { hideAnswerButton: true }),
   ],
   Random: [
     makeQuestion("Random", 100, "Wie viele Kontinente gibt es?", "Sieben"),
@@ -268,6 +299,8 @@ function makeQuestion(category, points, question, answer, options = {}) {
     videoSrc: options.videoSrc ?? "",
     music300Tracks: options.music300Tracks ?? [],
     music500Tracks: options.music500Tracks ?? [],
+    sport300Prompts: options.sport300Prompts ?? [],
+    sport500Rings: options.sport500Rings ?? false,
   };
 }
 
@@ -291,6 +324,9 @@ function buildInitialState() {
     posterRevealState: {},
     music300RevealState: {},
     music500RevealState: {},
+    sport300RevealState: {},
+    sport500RevealState: {},
+    singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
   };
@@ -334,6 +370,15 @@ function loadState() {
         ...fallback.music500RevealState,
         ...parsed.music500RevealState,
       },
+      sport300RevealState: {
+        ...fallback.sport300RevealState,
+        ...parsed.sport300RevealState,
+      },
+      sport500RevealState: {
+        ...fallback.sport500RevealState,
+        ...parsed.sport500RevealState,
+      },
+      singleQuestionResetMode: false,
     };
   } catch {
     return buildInitialState();
@@ -382,6 +427,9 @@ function resetQuestionsOnly() {
     posterRevealState: {},
     music300RevealState: {},
     music500RevealState: {},
+    sport300RevealState: {},
+    sport500RevealState: {},
+    singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
   }));
@@ -455,6 +503,9 @@ function quizBoard() {
             <h1>BdayBasti</h1>
           </div>
           <div class="board-header-actions">
+            <button type="button" class="ghost-button ${state.singleQuestionResetMode ? "is-active-reset" : ""}" id="toggle-single-question-reset">
+              ${state.singleQuestionResetMode ? "Reset-Modus aktiv" : "Einzelfrage resetten"}
+            </button>
             <button type="button" class="ghost-button" id="reset-questions">Nur Fragen resetten</button>
             <button type="button" class="danger-button" id="reset-game">Alles resetten</button>
           </div>
@@ -469,12 +520,14 @@ function quizBoard() {
                   .map((entry) => {
                     const questionState = state.questions[entry.id];
                     const locked = isQuestionLocked(entry);
+                    const canResetSingleQuestion = state.singleQuestionResetMode && questionState.used;
+                    const isDisabled = !canResetSingleQuestion && (questionState.used || locked);
                     return `
                       <button
                         type="button"
-                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""}"
+                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${canResetSingleQuestion ? "is-reset-target" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""} ${entry.category === "Sport" && entry.points === 100 ? "is-sport-100" : ""} ${entry.category === "Sport" && entry.points === 200 ? "is-sport-200" : ""} ${entry.category === "Sport" && entry.points === 300 ? "is-sport-300" : ""} ${entry.category === "Sport" && entry.points === 500 ? "is-sport-500" : ""} ${entry.category === "Sport" && entry.points === 1000 ? "is-sport-1000" : ""} ${entry.category === "Basti" && entry.points === 100 ? "is-basti-100" : ""} ${entry.category === "Basti" && entry.points === 200 ? "is-basti-200" : ""} ${entry.category === "Basti" && entry.points === 300 ? "is-basti-300" : ""} ${entry.category === "Basti" && entry.points === 500 ? "is-basti-500" : ""} ${entry.category === "Basti" && entry.points === 1000 ? "is-basti-1000" : ""}"
                         data-question-id="${entry.id}"
-                        ${questionState.used || locked ? "disabled" : ""}
+                        ${isDisabled ? "disabled" : ""}
                       >
                         ${entry.points}
                       </button>
@@ -554,9 +607,14 @@ function buildMusicTrackEmbed(track) {
   };
 }
 
+const SPORT_500_RING_REVEAL_ORDER = ["blue", "yellow", "black", "green", "red"];
+
 function questionScreen(question) {
   const isMusic300 = question.category === "Musik" && question.points === 300;
   const isMusic500 = question.category === "Musik" && question.points === 500;
+  const isSport500 = question.category === "Sport" && question.points === 500 && question.sport500Rings;
+  const sport500RevealCount = isSport500 ? (state.sport500RevealState[question.id] ?? 0) : 0;
+  const revealedRingKeys = SPORT_500_RING_REVEAL_ORDER.slice(0, sport500RevealCount);
 
   return `
     <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""} ${isMusic300 ? "is-music-300-question" : ""} ${isMusic500 ? "is-music-500-question" : ""}" data-question-stage-trigger="true">
@@ -589,6 +647,26 @@ function questionScreen(question) {
                           ? "CDY - LACAZETTE x JAZEEK"
                         : question.category === "Musik" && question.points === 1000
                           ? "Ain't No Mountain High Enough - Marvin Gaye & Tammi Terrell"
+                        : question.category === "Sport" && question.points === 100
+                          ? "Kraftsport"
+                        : question.category === "Sport" && question.points === 200
+                          ? "Racing"
+                        : question.category === "Sport" && question.points === 300
+                          ? "Badminton"
+                        : question.category === "Sport" && question.points === 500
+                          ? "Herr der Ringe"
+                        : question.category === "Sport" && question.points === 1000
+                          ? "Leichtathletik"
+                        : question.category === "Basti" && question.points === 100
+                          ? "Basti, der Sparfuchs"
+                        : question.category === "Basti" && question.points === 200
+                          ? "Basti, der Nerd"
+                        : question.category === "Basti" && question.points === 300
+                          ? "Basti, der Arbeitnehmner"
+                        : question.category === "Basti" && question.points === 500
+                          ? "Basti, der Mitbewohner"
+                        : question.category === "Basti" && question.points === 1000
+                          ? "Basti, der Feinschmecker"
                         : "placeholder"
               }</p>`
             : ""
@@ -774,7 +852,50 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length
+          state.revealStage >= 1 && question.sport300Prompts.length
+            ? `
+              <div class="sport300-list">
+                ${question.sport300Prompts
+                  .map((item) => {
+                    const solved = !!state.sport300RevealState[question.id]?.[item.id];
+                    return `
+                      <article class="sport300-item">
+                        <p class="sport300-question">${escapeHtml(item.question)}</p>
+                        <button
+                          type="button"
+                          class="ghost-button sport300-solve"
+                          data-sport300-reveal-question-id="${question.id}"
+                          data-sport300-reveal-id="${item.id}"
+                          ${solved ? "disabled" : ""}
+                        >
+                          Lösen
+                        </button>
+                        ${solved ? `<p class="sport300-answer">${escapeHtml(item.answer)}</p>` : ""}
+                      </article>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 1 && isSport500
+            ? `
+              <div class="sport500-rings-panel">
+                <div class="olympic-rings">
+                  <span class="olympic-ring ring-blue ${revealedRingKeys.includes("blue") ? "is-revealed" : ""}"></span>
+                  <span class="olympic-ring ring-black ${revealedRingKeys.includes("black") ? "is-revealed" : ""}"></span>
+                  <span class="olympic-ring ring-red ${revealedRingKeys.includes("red") ? "is-revealed" : ""}"></span>
+                  <span class="olympic-ring ring-yellow ${revealedRingKeys.includes("yellow") ? "is-revealed" : ""}"></span>
+                  <span class="olympic-ring ring-green ${revealedRingKeys.includes("green") ? "is-revealed" : ""}"></span>
+                </div>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500
             ? `
               <div class="answer-panel">
                 <p class="answer-label">Lösung</p>
@@ -784,6 +905,13 @@ function questionScreen(question) {
             : ""
         }
         <div class="question-actions">
+          ${
+            state.revealStage === 1 && isSport500
+              ? `${sport500RevealCount < SPORT_500_RING_REVEAL_ORDER.length
+                  ? `<button type="button" class="primary-button" id="sport500-reveal-ring">Reveal</button>`
+                  : ""}`
+              : ""
+          }
           ${
             state.revealStage === 1 && !question.hideAnswerButton
             && !(question.category === "Filme" && (question.points === 500 || question.points === 1000))
@@ -795,7 +923,7 @@ function questionScreen(question) {
               : ""
           }
           ${
-            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500
+            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length)
               ? `<button type="button" class="primary-button" id="return-to-board">Zurück zum Quiz</button>`
               : ""
           }
@@ -913,10 +1041,55 @@ function bindSetupEvents() {
 function bindBoardEvents() {
   document.querySelector("#reset-game")?.addEventListener("click", resetGame);
   document.querySelector("#reset-questions")?.addEventListener("click", resetQuestionsOnly);
+  document.querySelector("#toggle-single-question-reset")?.addEventListener("click", () => {
+    setState((current) => ({
+      ...current,
+      singleQuestionResetMode: !current.singleQuestionResetMode,
+    }));
+  });
 
   document.querySelectorAll("[data-question-id]").forEach((button) => {
     button.addEventListener("click", () => {
       const questionId = button.getAttribute("data-question-id");
+
+      if (state.singleQuestionResetMode) {
+        if (!state.questions[questionId]?.used) {
+          return;
+        }
+
+        setState((current) => {
+          const nextPosterRevealState = { ...current.posterRevealState };
+          const nextMusic300RevealState = { ...current.music300RevealState };
+          const nextMusic500RevealState = { ...current.music500RevealState };
+          const nextSport300RevealState = { ...current.sport300RevealState };
+          const nextSport500RevealState = { ...current.sport500RevealState };
+
+          delete nextPosterRevealState[questionId];
+          delete nextMusic300RevealState[questionId];
+          delete nextMusic500RevealState[questionId];
+          delete nextSport300RevealState[questionId];
+          delete nextSport500RevealState[questionId];
+
+          return {
+            ...current,
+            singleQuestionResetMode: false,
+            questions: {
+              ...current.questions,
+              [questionId]: {
+                ...current.questions[questionId],
+                used: false,
+              },
+            },
+            posterRevealState: nextPosterRevealState,
+            music300RevealState: nextMusic300RevealState,
+            music500RevealState: nextMusic500RevealState,
+            sport300RevealState: nextSport300RevealState,
+            sport500RevealState: nextSport500RevealState,
+          };
+        });
+        return;
+      }
+
       setState((current) => ({
         ...current,
         screen: "question",
@@ -1077,6 +1250,45 @@ function bindQuestionEvents() {
           },
         },
       }));
+    });
+  });
+
+  document.querySelectorAll("[data-sport300-reveal-id]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const questionId = button.getAttribute("data-sport300-reveal-question-id");
+      const promptId = button.getAttribute("data-sport300-reveal-id");
+
+      setState((current) => ({
+        ...current,
+        sport300RevealState: {
+          ...current.sport300RevealState,
+          [questionId]: {
+            ...(current.sport300RevealState[questionId] ?? {}),
+            [promptId]: true,
+          },
+        },
+      }));
+    });
+  });
+
+  document.querySelector("#sport500-reveal-ring")?.addEventListener("click", () => {
+    const activeQuestion = state.activeQuestionId ? state.questions[state.activeQuestionId] : null;
+
+    if (!activeQuestion?.sport500Rings) {
+      return;
+    }
+
+    setState((current) => {
+      const currentCount = current.sport500RevealState[activeQuestion.id] ?? 0;
+      const nextCount = Math.min(SPORT_500_RING_REVEAL_ORDER.length, currentCount + 1);
+
+      return {
+        ...current,
+        sport500RevealState: {
+          ...current.sport500RevealState,
+          [activeQuestion.id]: nextCount,
+        },
+      };
     });
   });
 

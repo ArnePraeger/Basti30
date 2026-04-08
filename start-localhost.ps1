@@ -5,8 +5,12 @@ param(
 $projectRoot = Split-Path -Parent $MyInvocation.MyCommand.Path
 Set-Location -LiteralPath $projectRoot
 
+$cacheBuster = [DateTimeOffset]::UtcNow.ToUnixTimeSeconds()
+$url = "http://localhost:$Port/index.html?v=$cacheBuster"
+
 Write-Host "Starte lokalen Server auf http://localhost:$Port ..."
-Start-Process "http://localhost:$Port/index.html"
+Write-Host "Oeffne $url (Cache-Buster aktiv)"
+Start-Process $url
 
 try {
   py -m http.server $Port
