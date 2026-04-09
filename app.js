@@ -235,7 +235,7 @@ const QUESTION_BANK = {
       100,
       "Was ist Bastis Lieblingskraftsportübung?",
       "Bankdrücken",
-      { sport100RevealVideoSrc: "./Videos/02 .mp4" },
+      { sport100RevealVideoSrc: "./Videos/02.mp4" },
     ),
     makeQuestion("Sport", 200, "Wie schnell, darf man in Deutschland mit einem E-Scooter im Straßenverkehr fahren?", "20 km/h"),
     makeQuestion(
@@ -768,7 +768,7 @@ function questionScreen(question) {
             ? `
               <div class="basti500-intro-video-panel">
                 <video class="basti500-intro-video" data-music1000-intro-video autoplay muted loop playsinline preload="auto" controls>
-                  <source src="./Videos/03 .mp4" type="video/mp4" />
+                  <source src="./Videos/03.mp4" type="video/mp4" />
                 </video>
               </div>
             `
@@ -779,7 +779,7 @@ function questionScreen(question) {
             ? `
               <div class="basti500-intro-video-panel">
                 <video class="basti500-intro-video" data-basti300-intro-video autoplay muted loop playsinline preload="auto" controls>
-                  <source src="./Videos/04 .mp4" type="video/mp4" />
+                  <source src="./Videos/04.mp4" type="video/mp4" />
                 </video>
               </div>
             `
