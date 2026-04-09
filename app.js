@@ -302,10 +302,25 @@ const QUESTION_BANK = {
   ],
   Random: [
     makeQuestion("Random", 100, "Wie viele Kontinente gibt es?", "Sieben"),
-    makeQuestion("Random", 200, "Welche Farbe entsteht aus Blau und Gelb?", "Grün"),
-    makeQuestion("Random", 300, "Wie lautet die Hauptstadt von Spanien?", "Madrid"),
-    makeQuestion("Random", 500, "Wie viele Tage hat ein Schaltjahr?", "366"),
-    makeQuestion("Random", 1000, "Welches Element hat das chemische Symbol O?", "Sauerstoff"),
+    makeQuestion(
+      "Random",
+      200,
+      "Ordne die Handies nach ihrem Erscheinungsdatum (älteste zuerst).",
+      "",
+      {
+        hideAnswerButton: true,
+        random300Phones: [
+          { id: "r300-note9", year: 2018, label: "Samsung Galaxy Note 9", src: "./Bilder/Random300/2018_SamsungGalaxyNote9.jpg" },
+          { id: "r300-p7", year: 2014, label: "Huawei Ascend P7", src: "./Bilder/Random300/2014_huaweiAscendP7.jpg" },
+          { id: "r300-pixel2", year: 2017, label: "Google Pixel 2", src: "./Bilder/Random300/2017_googlePixel2.jpg" },
+          { id: "r300-iphone6s", year: 2015, label: "iPhone 6s", src: "./Bilder/Random300/2015_iphone6s.jpg" },
+          { id: "r300-oneplus3", year: 2016, label: "OnePlus 3", src: "./Bilder/Random300/2016_onePlus3.jpg" },
+        ],
+      },
+    ),
+    makeQuestion("Random", 300, 'Welches Körperteil hat Basti sich in seiner Jugend mal gebrochen? Tipp: Es hat etwas mit einem "Autounfall" zu tun.', "Fuß"),
+    makeQuestion("Random", 500, 'Basti ist Teil der "Fuge"-Crew. Wieviele Veranstaltungen fanden 2025 in der Fuge statt?', "Luis fragen"),
+    makeQuestion("Random", 1000, "Kocht das perfekte Ei (Sebastian bewertet), aber ihr dürft keine Uhr benutzen!", "", { hideAnswerButton: true }),
   ],
 };
 
@@ -328,6 +343,7 @@ function makeQuestion(category, points, question, answer, options = {}) {
     sport300Prompts: options.sport300Prompts ?? [],
     sport500Rings: options.sport500Rings ?? false,
     basti500Photos: options.basti500Photos ?? [],
+    random300Phones: options.random300Phones ?? [],
   };
 }
 
@@ -354,6 +370,7 @@ function buildInitialState() {
     sport300RevealState: {},
     sport500RevealState: {},
     basti500RevealState: {},
+    random300RevealState: {},
     singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
@@ -410,6 +427,10 @@ function loadState() {
         ...fallback.basti500RevealState,
         ...parsed.basti500RevealState,
       },
+      random300RevealState: {
+        ...fallback.random300RevealState,
+        ...parsed.random300RevealState,
+      },
       singleQuestionResetMode: false,
     };
   } catch {
@@ -462,6 +483,7 @@ function resetQuestionsOnly() {
     sport300RevealState: {},
     sport500RevealState: {},
     basti500RevealState: {},
+    random300RevealState: {},
     singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
@@ -558,7 +580,7 @@ function quizBoard() {
                     return `
                       <button
                         type="button"
-                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${canResetSingleQuestion ? "is-reset-target" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""} ${entry.category === "Sport" && entry.points === 100 ? "is-sport-100" : ""} ${entry.category === "Sport" && entry.points === 200 ? "is-sport-200" : ""} ${entry.category === "Sport" && entry.points === 300 ? "is-sport-300" : ""} ${entry.category === "Sport" && entry.points === 500 ? "is-sport-500" : ""} ${entry.category === "Sport" && entry.points === 1000 ? "is-sport-1000" : ""} ${entry.category === "Basti" && entry.points === 100 ? "is-basti-100" : ""} ${entry.category === "Basti" && entry.points === 200 ? "is-basti-200" : ""} ${entry.category === "Basti" && entry.points === 300 ? "is-basti-300" : ""} ${entry.category === "Basti" && entry.points === 500 ? "is-basti-500" : ""} ${entry.category === "Basti" && entry.points === 1000 ? "is-basti-1000" : ""}"
+                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${canResetSingleQuestion ? "is-reset-target" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""} ${entry.category === "Sport" && entry.points === 100 ? "is-sport-100" : ""} ${entry.category === "Sport" && entry.points === 200 ? "is-sport-200" : ""} ${entry.category === "Sport" && entry.points === 300 ? "is-sport-300" : ""} ${entry.category === "Sport" && entry.points === 500 ? "is-sport-500" : ""} ${entry.category === "Sport" && entry.points === 1000 ? "is-sport-1000" : ""} ${entry.category === "Basti" && entry.points === 100 ? "is-basti-100" : ""} ${entry.category === "Basti" && entry.points === 200 ? "is-basti-200" : ""} ${entry.category === "Basti" && entry.points === 300 ? "is-basti-300" : ""} ${entry.category === "Basti" && entry.points === 500 ? "is-basti-500" : ""} ${entry.category === "Basti" && entry.points === 1000 ? "is-basti-1000" : ""} ${entry.category === "Random" && entry.points === 200 ? "is-random-200" : ""} ${entry.category === "Random" && entry.points === 300 ? "is-random-300" : ""} ${entry.category === "Random" && entry.points === 500 ? "is-random-500" : ""} ${entry.category === "Random" && entry.points === 1000 ? "is-random-1000" : ""}"
                         data-question-id="${entry.id}"
                         ${isDisabled ? "disabled" : ""}
                       >
@@ -642,15 +664,23 @@ function buildMusicTrackEmbed(track) {
 
 const SPORT_500_RING_REVEAL_ORDER = ["blue", "yellow", "black", "green", "red"];
 
+function getRandom300RevealOrder(question) {
+  return [...question.random300Phones].sort((a, b) => a.year - b.year);
+}
+
 function questionScreen(question) {
   const isMusic300 = question.category === "Musik" && question.points === 300;
   const isMusic500 = question.category === "Musik" && question.points === 500;
   const isSport500 = question.category === "Sport" && question.points === 500 && question.sport500Rings;
   const isBasti500 = question.category === "Basti" && question.points === 500 && question.basti500Photos.length > 0;
+  const isRandom300 = question.category === "Random" && question.points === 200 && question.random300Phones.length > 0;
   const sport500RevealCount = isSport500 ? (state.sport500RevealState[question.id] ?? 0) : 0;
   const revealedRingKeys = SPORT_500_RING_REVEAL_ORDER.slice(0, sport500RevealCount);
   const basti500RevealCount = isBasti500 ? (state.basti500RevealState[question.id] ?? 0) : 0;
   const revealedBasti500Photos = isBasti500 ? question.basti500Photos.slice(0, basti500RevealCount) : [];
+  const random300RevealedMap = isRandom300 ? (state.random300RevealState[question.id] ?? {}) : {};
+  const random300RevealOrder = isRandom300 ? getRandom300RevealOrder(question) : [];
+  const random300AllRevealed = isRandom300 && random300RevealOrder.every((phone) => !!random300RevealedMap[phone.id]);
 
   return `
     <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""} ${isMusic300 ? "is-music-300-question" : ""} ${isMusic500 ? "is-music-500-question" : ""}" data-question-stage-trigger="true">
@@ -703,6 +733,14 @@ function questionScreen(question) {
                           ? "Basti, der Mitbewohner"
                         : question.category === "Basti" && question.points === 1000
                           ? "Basti, der Feinschmecker"
+                        : question.category === "Random" && question.points === 1000
+                          ? "Das perfekte Ei"
+                        : question.category === "Random" && question.points === 200
+                          ? "Bastis Tech Tipps"
+                        : question.category === "Random" && question.points === 300
+                          ? "Knick Knack"
+                        : question.category === "Random" && question.points === 500
+                          ? "Wurzner Straße 20"
                         : "placeholder"
               }</p>`
             : ""
@@ -948,7 +986,29 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500 && !isBasti500
+          state.revealStage >= 1 && isRandom300
+            ? `
+              <div class="random300-grid">
+                ${question.random300Phones
+                  .map((phone) => {
+                    const isRevealed = !!random300RevealedMap[phone.id];
+                    return `
+                      <article class="random300-card">
+                        <div class="random300-image-wrap">
+                          <img src="${phone.src}" alt="${escapeHtml(phone.label)}" class="random300-image" />
+                        </div>
+                        <p class="random300-label">${escapeHtml(phone.label)}</p>
+                        ${isRevealed ? `<p class="random300-year">${phone.year}</p>` : ""}
+                      </article>
+                    `;
+                  })
+                  .join("")}
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500 && !isBasti500 && !isRandom300
             ? `
               <div class="answer-panel">
                 <p class="answer-label">Lösung</p>
@@ -958,6 +1018,13 @@ function questionScreen(question) {
             : ""
         }
         <div class="question-actions">
+          ${
+            state.revealStage === 1 && isRandom300
+              ? `${!random300AllRevealed
+                  ? `<button type="button" class="primary-button" id="random300-reveal-phone">Reveal</button>`
+                  : ""}`
+              : ""
+          }
           ${
             state.revealStage === 1 && isBasti500
               ? `${basti500RevealCount < question.basti500Photos.length
@@ -983,7 +1050,7 @@ function questionScreen(question) {
               : ""
           }
           ${
-            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length) && (!isBasti500 || basti500RevealCount >= question.basti500Photos.length)
+            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length) && (!isBasti500 || basti500RevealCount >= question.basti500Photos.length) && (!isRandom300 || random300AllRevealed)
               ? `<button type="button" class="primary-button" id="return-to-board">Zurück zum Quiz</button>`
               : ""
           }
@@ -1124,6 +1191,7 @@ function bindBoardEvents() {
           const nextSport300RevealState = { ...current.sport300RevealState };
           const nextSport500RevealState = { ...current.sport500RevealState };
           const nextBasti500RevealState = { ...current.basti500RevealState };
+          const nextRandom300RevealState = { ...current.random300RevealState };
 
           delete nextPosterRevealState[questionId];
           delete nextMusic300RevealState[questionId];
@@ -1131,6 +1199,7 @@ function bindBoardEvents() {
           delete nextSport300RevealState[questionId];
           delete nextSport500RevealState[questionId];
           delete nextBasti500RevealState[questionId];
+          delete nextRandom300RevealState[questionId];
 
           return {
             ...current,
@@ -1148,6 +1217,7 @@ function bindBoardEvents() {
             sport300RevealState: nextSport300RevealState,
             sport500RevealState: nextSport500RevealState,
             basti500RevealState: nextBasti500RevealState,
+            random300RevealState: nextRandom300RevealState,
           };
         });
         return;
@@ -1371,6 +1441,35 @@ function bindQuestionEvents() {
         basti500RevealState: {
           ...current.basti500RevealState,
           [activeQuestion.id]: nextCount,
+        },
+      };
+    });
+  });
+
+  document.querySelector("#random300-reveal-phone")?.addEventListener("click", () => {
+    const activeQuestion = state.activeQuestionId ? state.questions[state.activeQuestionId] : null;
+
+    if (!activeQuestion?.random300Phones?.length) {
+      return;
+    }
+
+    setState((current) => {
+      const revealedMap = current.random300RevealState[activeQuestion.id] ?? {};
+      const revealOrder = getRandom300RevealOrder(activeQuestion);
+      const nextPhone = revealOrder.find((phone) => !revealedMap[phone.id]);
+
+      if (!nextPhone) {
+        return current;
+      }
+
+      return {
+        ...current,
+        random300RevealState: {
+          ...current.random300RevealState,
+          [activeQuestion.id]: {
+            ...revealedMap,
+            [nextPhone.id]: true,
+          },
         },
       };
     });
