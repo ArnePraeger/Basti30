@@ -301,6 +301,7 @@ const QUESTION_BANK = {
           { id: "14-torben", src: "./Bilder/Basti500/14_torben.JPG", alt: "Torben" },
           { id: "15-samu", src: "./Bilder/Basti500/15_samu.jpeg", alt: "Samu" },
           { id: "16-ole", src: "./Bilder/Basti500/16_ole.jpg", alt: "Ole" },
+          { id: "17-yorick", src: "./Bilder/Basti500/17_yorick.jpg", alt: "Yorick" },
         ],
       },
     ),
@@ -824,6 +825,101 @@ function questionScreen(question) {
               <div class="basti500-intro-video-panel">
                 <video class="basti500-intro-video" data-basti100-intro-video autoplay muted loop playsinline preload="auto" controls>
                   <source src="./Videos/08.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Basti" && question.points === 200
+            ? `
+              <div class="basti500-intro-video-panel">
+                <img class="placeholder-intro-image" src="./Bilder/placeholder/Basti200.jpg" alt="Basti 200 Placeholder" />
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Filme" && question.points === 1000
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-filme1000-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/09.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Filme" && question.points === 300
+            ? `
+              <div class="basti500-intro-video-panel">
+                <img class="placeholder-intro-image" src="./Bilder/placeholder/Film300.jpg" alt="Film 300 Placeholder" />
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Musik" && question.points === 100
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-musik100-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/10.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Musik" && question.points === 500
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-musik500-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/11.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Sport" && question.points === 500
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-sport500-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/12.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Sport" && question.points === 1000
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-sport1000-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/13.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Random" && question.points === 500
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-random500-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/14.mp4" type="video/mp4" />
+                </video>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage < 1 && question.category === "Random" && question.points === 200
+            ? `
+              <div class="basti500-intro-video-panel">
+                <video class="basti500-intro-video" data-random200-intro-video autoplay muted loop playsinline preload="auto" controls>
+                  <source src="./Videos/15.mp4" type="video/mp4" />
                 </video>
               </div>
             `
@@ -1615,6 +1711,69 @@ function bindQuestionEvents() {
       basti100IntroVideo.volume = 1;
     }
     basti100IntroVideo.play().catch(() => {});
+  });
+
+  const filme1000IntroVideo = document.querySelector("[data-filme1000-intro-video]");
+  filme1000IntroVideo?.addEventListener("click", () => {
+    if (filme1000IntroVideo.muted) {
+      filme1000IntroVideo.muted = false;
+      filme1000IntroVideo.volume = 1;
+    }
+    filme1000IntroVideo.play().catch(() => {});
+  });
+
+  const musik100IntroVideo = document.querySelector("[data-musik100-intro-video]");
+  musik100IntroVideo?.addEventListener("click", () => {
+    if (musik100IntroVideo.muted) {
+      musik100IntroVideo.muted = false;
+      musik100IntroVideo.volume = 1;
+    }
+    musik100IntroVideo.play().catch(() => {});
+  });
+
+  const musik500IntroVideo = document.querySelector("[data-musik500-intro-video]");
+  musik500IntroVideo?.addEventListener("click", () => {
+    if (musik500IntroVideo.muted) {
+      musik500IntroVideo.muted = false;
+      musik500IntroVideo.volume = 1;
+    }
+    musik500IntroVideo.play().catch(() => {});
+  });
+
+  const sport500IntroVideo = document.querySelector("[data-sport500-intro-video]");
+  sport500IntroVideo?.addEventListener("click", () => {
+    if (sport500IntroVideo.muted) {
+      sport500IntroVideo.muted = false;
+      sport500IntroVideo.volume = 1;
+    }
+    sport500IntroVideo.play().catch(() => {});
+  });
+
+  const sport1000IntroVideo = document.querySelector("[data-sport1000-intro-video]");
+  sport1000IntroVideo?.addEventListener("click", () => {
+    if (sport1000IntroVideo.muted) {
+      sport1000IntroVideo.muted = false;
+      sport1000IntroVideo.volume = 1;
+    }
+    sport1000IntroVideo.play().catch(() => {});
+  });
+
+  const random500IntroVideo = document.querySelector("[data-random500-intro-video]");
+  random500IntroVideo?.addEventListener("click", () => {
+    if (random500IntroVideo.muted) {
+      random500IntroVideo.muted = false;
+      random500IntroVideo.volume = 1;
+    }
+    random500IntroVideo.play().catch(() => {});
+  });
+
+  const random200IntroVideo = document.querySelector("[data-random200-intro-video]");
+  random200IntroVideo?.addEventListener("click", () => {
+    if (random200IntroVideo.muted) {
+      random200IntroVideo.muted = false;
+      random200IntroVideo.volume = 1;
+    }
+    random200IntroVideo.play().catch(() => {});
   });
 
   document.querySelector("#random300-reveal-phone")?.addEventListener("click", () => {
