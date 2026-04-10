@@ -676,12 +676,23 @@ function getRandom300RevealOrder(question) {
   return [...question.random300Phones].sort((a, b) => a.year - b.year);
 }
 
+function hasPlaceholderMedia(question) {
+  return (
+    (question.category === "Basti" && (question.points === 100 || question.points === 200 || question.points === 300 || question.points === 500 || question.points === 1000))
+    || (question.category === "Musik" && (question.points === 100 || question.points === 500 || question.points === 1000))
+    || (question.category === "Sport" && (question.points === 200 || question.points === 300 || question.points === 500 || question.points === 1000))
+    || (question.category === "Filme" && (question.points === 300 || question.points === 1000))
+    || (question.category === "Random" && (question.points === 200 || question.points === 500))
+  );
+}
+
 function questionScreen(question) {
   const isMusic300 = question.category === "Musik" && question.points === 300;
   const isMusic500 = question.category === "Musik" && question.points === 500;
   const isSport500 = question.category === "Sport" && question.points === 500 && question.sport500Rings;
   const isBasti500 = question.category === "Basti" && question.points === 500 && question.basti500Photos.length > 0;
   const isRandom300 = question.category === "Random" && question.points === 200 && question.random300Phones.length > 0;
+  const showPlaceholderSubtitle = state.revealStage < 1 && !hasPlaceholderMedia(question);
   const sport500RevealCount = isSport500 ? (state.sport500RevealState[question.id] ?? 0) : 0;
   const revealedRingKeys = SPORT_500_RING_REVEAL_ORDER.slice(0, sport500RevealCount);
   const basti500RevealCount = isBasti500 ? (state.basti500RevealState[question.id] ?? 0) : 0;
@@ -699,7 +710,7 @@ function questionScreen(question) {
           <p class="question-points">${question.points}</p>
         </div>
         ${
-          state.revealStage < 1
+          showPlaceholderSubtitle
             ? `<p class="question-subtitle">${
                 question.category === "Filme" && question.points === 100
                   ? "Birdman"
