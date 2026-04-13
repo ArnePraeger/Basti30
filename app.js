@@ -267,7 +267,7 @@ const QUESTION_BANK = {
     makeQuestion(
       "Sport",
       500,
-      "Welche Farben haben die olympischen Ringe (von rechts nach links)?",
+      "Welche Farben haben die olympischen Ringe (von links nach rechts)?",
       "",
       { hideAnswerButton: true, sport500Rings: true },
     ),
