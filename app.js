@@ -994,6 +994,19 @@ function questionScreen(question) {
             : ""
         }
         ${
+          state.revealStage >= 1 && question.category === "Basti" && question.points === 1000
+            ? `
+              <div class="basti1000-question-image-panel">
+                <img
+                  class="basti1000-question-image"
+                  src="./Bilder/Basti1000/photo_5404456541286503257_y.jpg"
+                  alt="Basti 1000"
+                />
+              </div>
+            `
+            : ""
+        }
+        ${
           state.revealStage >= 1 && question.factChoices.length
             ? `
               <div class="fact-choice-list">
