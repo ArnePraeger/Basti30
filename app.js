@@ -308,7 +308,7 @@ const QUESTION_BANK = {
     makeQuestion("Basti", 1000, "ELFBAR-TASTING!", "", { hideAnswerButton: true }),
   ],
   Random: [
-    makeQuestion("Random", 100, "Wie viele Kontinente gibt es?", "Sieben"),
+    makeQuestion("Random", 100, 'Basti ist Teil der "Fuge"-Crew. Schätzt wie viele Veranstaltungen 2025 in der Fuge stattfanden! (Quelle: Telegram Channel)', "36"),
     makeQuestion(
       "Random",
       200,
@@ -326,7 +326,35 @@ const QUESTION_BANK = {
       },
     ),
     makeQuestion("Random", 300, 'Welches Körperteil hat Basti sich in seiner Jugend mal gebrochen? Tipp: Es hat etwas mit einem "Autounfall" zu tun.', "Fuß"),
-    makeQuestion("Random", 500, 'Basti ist Teil der "Fuge"-Crew. Wieviele Veranstaltungen fanden 2025 in der Fuge statt?', "Luis fragen"),
+    makeQuestion(
+      "Random",
+      500,
+      "Von welchen Personen stammen die nachfolgenden Zitate?",
+      "",
+      {
+        hideAnswerButton: true,
+        random500Quotes: [
+          {
+            id: "nihilist-penguin",
+            quote:
+              "And here he is heading off into the interior of the vast continent. With 5 000 kilometres ahead of him he's heading towards certain death.",
+            answer: "Werner Herzog - The nihilist penguin",
+          },
+          {
+            id: "gaben-der-danaer",
+            quote:
+              "Beginnt mit den Gaben (der Danaer) oder eher mit den Losungsformeln, die ihren heils mächtigen Unsinn dazu tun, die Sprache als Gesetz? Die rituellen Gaben nämlich sind bereits Symbole in dem Sinne, in dem “Symbol” einen Vertrag bedeutet, und ferner, weil sie zunächst Signifikanten eines Vertrags sind, den sie als Signifikant begründen; denn es ist augenfällig, dass die Gegenstände des symbolischen Tauschs - Gefäße, die leer bleiben müssen, schilde, die zu Tragen zu schwer sind, Garben, die vertrocknen, Lanzen, die man in den Boden steckt - nicht für den Gebrauch bestimmt und ihrer Fülle wegen sogar überflüssig sind.",
+            answer: "Jacques Lacant",
+          },
+          {
+            id: "kinski-schnauze",
+            quote:
+              "Jesus hat nicht nur gesagt: Halt deine Schnauze! Er hat eine Peitsche genommen und hat ihm in die Fresse gehauen! Das hat der gemacht. Du dumme Sau.",
+            answer: "Klaus Kinski",
+          },
+        ],
+      },
+    ),
     makeQuestion("Random", 1000, "Kocht das perfekte Ei (Sebastian bewertet), aber ihr dürft keine Uhr benutzen!", "", { hideAnswerButton: true }),
   ],
 };
@@ -352,6 +380,7 @@ function makeQuestion(category, points, question, answer, options = {}) {
     basti500Photos: options.basti500Photos ?? [],
     random300Phones: options.random300Phones ?? [],
     sport100RevealVideoSrc: options.sport100RevealVideoSrc ?? "",
+    random500Quotes: options.random500Quotes ?? [],
   };
 }
 
@@ -379,6 +408,7 @@ function buildInitialState() {
     sport500RevealState: {},
     basti500RevealState: {},
     random300RevealState: {},
+    random500QuoteState: {},
     singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
@@ -439,6 +469,10 @@ function loadState() {
         ...fallback.random300RevealState,
         ...parsed.random300RevealState,
       },
+      random500QuoteState: {
+        ...fallback.random500QuoteState,
+        ...parsed.random500QuoteState,
+      },
       singleQuestionResetMode: false,
     };
   } catch {
@@ -492,6 +526,7 @@ function resetQuestionsOnly() {
     sport500RevealState: {},
     basti500RevealState: {},
     random300RevealState: {},
+    random500QuoteState: {},
     singleQuestionResetMode: false,
     film100SeriesIndex: 0,
     film100SeriesRevealed: false,
@@ -588,7 +623,7 @@ function quizBoard() {
                     return `
                       <button
                         type="button"
-                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${canResetSingleQuestion ? "is-reset-target" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""} ${entry.category === "Sport" && entry.points === 100 ? "is-sport-100" : ""} ${entry.category === "Sport" && entry.points === 200 ? "is-sport-200" : ""} ${entry.category === "Sport" && entry.points === 300 ? "is-sport-300" : ""} ${entry.category === "Sport" && entry.points === 500 ? "is-sport-500" : ""} ${entry.category === "Sport" && entry.points === 1000 ? "is-sport-1000" : ""} ${entry.category === "Basti" && entry.points === 100 ? "is-basti-100" : ""} ${entry.category === "Basti" && entry.points === 200 ? "is-basti-200" : ""} ${entry.category === "Basti" && entry.points === 300 ? "is-basti-300" : ""} ${entry.category === "Basti" && entry.points === 500 ? "is-basti-500" : ""} ${entry.category === "Basti" && entry.points === 1000 ? "is-basti-1000" : ""} ${entry.category === "Random" && entry.points === 200 ? "is-random-200" : ""} ${entry.category === "Random" && entry.points === 300 ? "is-random-300" : ""} ${entry.category === "Random" && entry.points === 500 ? "is-random-500" : ""} ${entry.category === "Random" && entry.points === 1000 ? "is-random-1000" : ""}"
+                        class="question-tile ${questionState.used ? "is-used" : ""} ${locked ? "is-locked" : ""} ${canResetSingleQuestion ? "is-reset-target" : ""} ${entry.category === "Filme" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-film-${entry.points}` : ""} ${entry.category === "Musik" && (entry.points === 100 || entry.points === 200 || entry.points === 300 || entry.points === 500 || entry.points === 1000) ? `is-music-${entry.points}` : ""} ${entry.category === "Sport" && entry.points === 100 ? "is-sport-100" : ""} ${entry.category === "Sport" && entry.points === 200 ? "is-sport-200" : ""} ${entry.category === "Sport" && entry.points === 300 ? "is-sport-300" : ""} ${entry.category === "Sport" && entry.points === 500 ? "is-sport-500" : ""} ${entry.category === "Sport" && entry.points === 1000 ? "is-sport-1000" : ""} ${entry.category === "Basti" && entry.points === 100 ? "is-basti-100" : ""} ${entry.category === "Basti" && entry.points === 200 ? "is-basti-200" : ""} ${entry.category === "Basti" && entry.points === 300 ? "is-basti-300" : ""} ${entry.category === "Basti" && entry.points === 500 ? "is-basti-500" : ""} ${entry.category === "Basti" && entry.points === 1000 ? "is-basti-1000" : ""} ${entry.category === "Random" && entry.points === 100 ? "is-random-100" : ""} ${entry.category === "Random" && entry.points === 200 ? "is-random-200" : ""} ${entry.category === "Random" && entry.points === 300 ? "is-random-300" : ""} ${entry.category === "Random" && entry.points === 500 ? "is-random-500" : ""} ${entry.category === "Random" && entry.points === 1000 ? "is-random-1000" : ""}"
                         data-question-id="${entry.id}"
                         ${isDisabled ? "disabled" : ""}
                       >
@@ -682,7 +717,7 @@ function hasPlaceholderMedia(question) {
     || (question.category === "Musik" && (question.points === 100 || question.points === 500 || question.points === 1000))
     || (question.category === "Sport" && (question.points === 200 || question.points === 300 || question.points === 500 || question.points === 1000))
     || (question.category === "Filme" && (question.points === 300 || question.points === 1000))
-    || (question.category === "Random" && (question.points === 200 || question.points === 500))
+    || (question.category === "Random" && (question.points === 100 || question.points === 200))
   );
 }
 
@@ -692,6 +727,7 @@ function questionScreen(question) {
   const isSport500 = question.category === "Sport" && question.points === 500 && question.sport500Rings;
   const isBasti500 = question.category === "Basti" && question.points === 500 && question.basti500Photos.length > 0;
   const isRandom300 = question.category === "Random" && question.points === 200 && question.random300Phones.length > 0;
+  const isRandom500 = question.category === "Random" && question.points === 500 && question.random500Quotes.length > 0;
   const showPlaceholderSubtitle = state.revealStage < 1 && !hasPlaceholderMedia(question);
   const sport500RevealCount = isSport500 ? (state.sport500RevealState[question.id] ?? 0) : 0;
   const revealedRingKeys = SPORT_500_RING_REVEAL_ORDER.slice(0, sport500RevealCount);
@@ -700,6 +736,15 @@ function questionScreen(question) {
   const random300RevealedMap = isRandom300 ? (state.random300RevealState[question.id] ?? {}) : {};
   const random300RevealOrder = isRandom300 ? getRandom300RevealOrder(question) : [];
   const random300AllRevealed = isRandom300 && random300RevealOrder.every((phone) => !!random300RevealedMap[phone.id]);
+  const random500State = isRandom500
+    ? (state.random500QuoteState[question.id] ?? { index: -1, answerRevealed: false })
+    : { index: -1, answerRevealed: false };
+  const random500CurrentQuote = isRandom500
+    ? (random500State.index >= 0
+        ? question.random500Quotes[Math.max(0, Math.min(random500State.index, question.random500Quotes.length - 1))]
+        : null)
+    : null;
+  const random500IsLastQuote = isRandom500 && random500State.index >= question.random500Quotes.length - 1;
 
   return `
     <section class="question-screen ${question.category === "Filme" && question.points === 1000 ? "is-film-bonus-question" : ""} ${question.category === "Musik" && question.points === 200 ? "is-music-200-question" : ""} ${isMusic300 ? "is-music-300-question" : ""} ${isMusic500 ? "is-music-500-question" : ""}" data-question-stage-trigger="true">
@@ -758,8 +803,10 @@ function questionScreen(question) {
                           ? "Bastis Tech Tipps"
                         : question.category === "Random" && question.points === 300
                           ? "Knick Knack"
-                        : question.category === "Random" && question.points === 500
+                        : question.category === "Random" && question.points === 100
                           ? "Wurzner Straße 20"
+                        : question.category === "Random" && question.points === 500
+                          ? "Who said it?"
                         : "placeholder"
               }</p>`
             : ""
@@ -915,10 +962,10 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage < 1 && question.category === "Random" && question.points === 500
+          state.revealStage < 1 && question.category === "Random" && question.points === 100
             ? `
               <div class="basti500-intro-video-panel">
-                <video class="basti500-intro-video" data-random500-intro-video autoplay muted loop playsinline preload="auto" controls>
+                <video class="basti500-intro-video" data-random100-intro-video autoplay muted loop playsinline preload="auto" controls>
                   <source src="./Videos/14.mp4" type="video/mp4" />
                 </video>
               </div>
@@ -937,7 +984,7 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage >= 1
+          state.revealStage >= 1 && !(isRandom500 && random500State.index >= 0)
             ? `
               <div class="question-copy">
                 <h1>${formatQuestionText(question.question)}</h1>
@@ -1210,7 +1257,19 @@ function questionScreen(question) {
             : ""
         }
         ${
-          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500 && !isBasti500 && !isRandom300 && !question.sport100RevealVideoSrc
+          state.revealStage >= 1 && isRandom500 && random500CurrentQuote
+            ? `
+              <div class="sport300-list">
+                <article class="sport300-item">
+                  <p class="sport300-question">${formatQuestionText(random500CurrentQuote.quote)}</p>
+                  ${random500State.answerRevealed ? `<p class="sport300-answer">${escapeHtml(random500CurrentQuote.answer)}</p>` : ""}
+                </article>
+              </div>
+            `
+            : ""
+        }
+        ${
+          state.revealStage >= 2 && !question.factChoices.length && !question.music300Tracks.length && !question.music500Tracks.length && !question.sport300Prompts.length && !isSport500 && !isBasti500 && !isRandom300 && !isRandom500 && !question.sport100RevealVideoSrc
             ? `
               <div class="answer-panel">
                 <p class="answer-label">Lösung</p>
@@ -1220,6 +1279,19 @@ function questionScreen(question) {
             : ""
         }
         <div class="question-actions">
+          ${
+            state.revealStage === 1 && isRandom500
+              ? `${
+                  random500State.index < 0
+                    ? `<button type="button" class="primary-button" id="random500-next-quote">Nächstes Zitat</button>`
+                    : !random500State.answerRevealed
+                      ? `<button type="button" class="primary-button" id="random500-reveal-answer">Reveal</button>`
+                      : !random500IsLastQuote
+                        ? `<button type="button" class="primary-button" id="random500-next-quote">Nächstes Zitat</button>`
+                        : ""
+                }`
+              : ""
+          }
           ${
             state.revealStage === 1 && isRandom300
               ? `${!random300AllRevealed
@@ -1252,7 +1324,7 @@ function questionScreen(question) {
               : ""
           }
           ${
-            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length) && (!isBasti500 || basti500RevealCount >= question.basti500Photos.length) && (!isRandom300 || random300AllRevealed)
+            (state.revealStage >= 2 || (state.revealStage === 1 && question.hideAnswerButton)) && !isMusic300 && !isMusic500 && (!isSport500 || sport500RevealCount >= SPORT_500_RING_REVEAL_ORDER.length) && (!isBasti500 || basti500RevealCount >= question.basti500Photos.length) && (!isRandom300 || random300AllRevealed) && (!isRandom500 || (random500IsLastQuote && random500State.answerRevealed))
               ? `<button type="button" class="primary-button" id="return-to-board">Zurück zum Quiz</button>`
               : ""
           }
@@ -1394,6 +1466,7 @@ function bindBoardEvents() {
           const nextSport500RevealState = { ...current.sport500RevealState };
           const nextBasti500RevealState = { ...current.basti500RevealState };
           const nextRandom300RevealState = { ...current.random300RevealState };
+          const nextRandom500QuoteState = { ...current.random500QuoteState };
 
           delete nextPosterRevealState[questionId];
           delete nextMusic300RevealState[questionId];
@@ -1402,6 +1475,7 @@ function bindBoardEvents() {
           delete nextSport500RevealState[questionId];
           delete nextBasti500RevealState[questionId];
           delete nextRandom300RevealState[questionId];
+          delete nextRandom500QuoteState[questionId];
 
           return {
             ...current,
@@ -1420,6 +1494,7 @@ function bindBoardEvents() {
             sport500RevealState: nextSport500RevealState,
             basti500RevealState: nextBasti500RevealState,
             random300RevealState: nextRandom300RevealState,
+            random500QuoteState: nextRandom500QuoteState,
           };
         });
         return;
@@ -1430,6 +1505,13 @@ function bindBoardEvents() {
         screen: "question",
         activeQuestionId: questionId,
         revealStage: 0,
+        random500QuoteState: {
+          ...current.random500QuoteState,
+          [questionId]: {
+            index: -1,
+            answerRevealed: false,
+          },
+        },
         film100SeriesIndex: 0,
         film100SeriesRevealed: false,
         questions: {
@@ -1769,13 +1851,13 @@ function bindQuestionEvents() {
     sport1000IntroVideo.play().catch(() => {});
   });
 
-  const random500IntroVideo = document.querySelector("[data-random500-intro-video]");
-  random500IntroVideo?.addEventListener("click", () => {
-    if (random500IntroVideo.muted) {
-      random500IntroVideo.muted = false;
-      random500IntroVideo.volume = 1;
+  const random100IntroVideo = document.querySelector("[data-random100-intro-video]");
+  random100IntroVideo?.addEventListener("click", () => {
+    if (random100IntroVideo.muted) {
+      random100IntroVideo.muted = false;
+      random100IntroVideo.volume = 1;
     }
-    random500IntroVideo.play().catch(() => {});
+    random100IntroVideo.play().catch(() => {});
   });
 
   const random200IntroVideo = document.querySelector("[data-random200-intro-video]");
@@ -1810,6 +1892,53 @@ function bindQuestionEvents() {
           [activeQuestion.id]: {
             ...revealedMap,
             [nextPhone.id]: true,
+          },
+        },
+      };
+    });
+  });
+
+  document.querySelector("#random500-next-quote")?.addEventListener("click", () => {
+    const activeQuestion = state.activeQuestionId ? state.questions[state.activeQuestionId] : null;
+
+    if (!activeQuestion?.random500Quotes?.length) {
+      return;
+    }
+
+    setState((current) => {
+      const quoteState = current.random500QuoteState[activeQuestion.id] ?? { index: -1, answerRevealed: false };
+      const nextIndex = Math.min(activeQuestion.random500Quotes.length - 1, quoteState.index + 1);
+
+      return {
+        ...current,
+        random500QuoteState: {
+          ...current.random500QuoteState,
+          [activeQuestion.id]: {
+            index: nextIndex,
+            answerRevealed: false,
+          },
+        },
+      };
+    });
+  });
+
+  document.querySelector("#random500-reveal-answer")?.addEventListener("click", () => {
+    const activeQuestion = state.activeQuestionId ? state.questions[state.activeQuestionId] : null;
+
+    if (!activeQuestion?.random500Quotes?.length) {
+      return;
+    }
+
+    setState((current) => {
+      const quoteState = current.random500QuoteState[activeQuestion.id] ?? { index: -1, answerRevealed: false };
+
+      return {
+        ...current,
+        random500QuoteState: {
+          ...current.random500QuoteState,
+          [activeQuestion.id]: {
+            ...quoteState,
+            answerRevealed: true,
           },
         },
       };
